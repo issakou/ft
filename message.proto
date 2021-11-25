@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+package main;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+option (gogoproto.gostring_all) = true;
+option (gogoproto.goproto_stringer_all) = false;
+option (gogoproto.stringer_all) = true;
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.unmarshaler_all) = true;
+
+option (gogoproto.testgen_all) = true;
+option (gogoproto.equal_all) = true;
+option (gogoproto.populate_all) = true;
+
+enum Mode {
+  MODE_SEND = 0;
+  MODE_RECEIVE = 1;
+  MODE_GET = 2;
+  MODE_HOST = 3;
+}
+
+enum TransmitMode {
+  TRANSMIT_MODE_PUSH = 0;
+  TRANSMIT_MODE_PULL = 1;
+}
+
+enum MessageType {
+  MSG_REQUEST_SEND_FILE = 0;
+  MSG_ACCEPT_SEND_FILE = 1;
+  MSG_REJECT_SEND_FILE = 2;
+  MSG_FILE_CHUNK = 3;
+  MSG_FILE_CHUNK_ACK = 4;
+  MSG_REQUEST_GET_FILE = 5;
+  MSG_ACCEPT_GET_FILE = 6;
+  MSG_REJECT_GET_FILE = 7;
+  MSG_CANCEL_FILE = 8;
+  MSG_GET_FILE_CHUNK = 9;
+}
+
+message Message {
+  MessageType type = 1;
+  bytes body = 2;
+}
+
+message RequestSendFile {
+  uint32 request_id = 1;
+  string file_name = 2;
+  int64 file_size = 3;
+  TransmitMode mode = 4;
+  repeated uint32 clients = 5;
+}
+
+message AcceptSendFile {
+  uint32 request_id = 1;
+  uint32 file_id = 2;
+  uint32 chunk_size = 3;
+  uint32 chunks_buf_size = 4;
+  repeated uint32 clients = 5;
+}
+
+message RejectSendFile {
+  uint32 request_id = 1;
+}
+
+message GetFileChunk {
+  uint32 file_id = 1;
+  uint32 chunk_id = 2;
+}
+
+message FileChunk {
+  uint32 file_id = 1;
+  uint32 chunk_id = 2;
+  bytes data = 3;
+}
+
+message FileChunkAck {
+  uint32 file_id = 1;
+  uint32 chunk_id = 2;
+}
+
+message RequestGetFile {
+  string file_name = 1;
+  uint32 file_id = 2;
+  uint32 chunk_size = 3;
+  uint32 chunks_buf_size = 4;
+  repeated uint32 clients = 5;
+  repeated int64 ranges = 6;
+  TransmitMode mode = 7;
+}
+
+message AcceptGetFile {
+  uint32 file_id = 1;
+  int64 file_size = 3;
+  repeated uint32 clients = 2;
+}
+
+message RejectGetFile {
+  uint32 file_id = 1;
+}
+
+message CancelFile {
+  uint32 file_id = 1;
+}
